@@ -120,7 +120,7 @@ spec:
   - match: Host(`transmission.bender.sway.org`) && PathPrefix(`/`)
     kind: Rule
     services:
-    - name: transmission
+    - name: transmission-ui
       port: 9091
     middlewares:
     - name: redirect
@@ -137,7 +137,7 @@ spec:
   - match: Host(`transmission.bender.sway.org`) && PathPrefix(`/`)
     kind: Rule
     services:
-    - name: transmission 
+    - name: transmission-ui
       port: 9091
   tls:
     certResolver: myresolver
