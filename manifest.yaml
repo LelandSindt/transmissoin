@@ -23,6 +23,8 @@ spec:
         volumeMounts:
         - name: downloads
           mountPath: /downloads
+        - name: config
+          mountPath: /config
         ports:
         - containerPort: 9091
         env:
@@ -39,12 +41,27 @@ spec:
       volumes:
       - name: downloads
         persistentVolumeClaim:
-          claimName: transmission
+          claimName: transmission-downloads
+      - name: config
+        persistentVolumeClaim:
+          claimName: transmission-config
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: transmission
+  name: transmission-config
+spec:
+  storageClassName: local-path
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 8Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: transmission-downloads
 spec:
   storageClassName: local-path
   accessModes:
