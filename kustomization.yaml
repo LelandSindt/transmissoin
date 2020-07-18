@@ -7,3 +7,6 @@ images:
 resources:
 - manifest.yaml
 
+generators:
+- transmission.yaml
+
