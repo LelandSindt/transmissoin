@@ -1,0 +1,101 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: transmission
+  labels:
+    app: transmission 
+spec:
+  replicas: 1
+  revisionHistoryLimit: 3
+  selector:
+    matchLabels:
+      app: transmission
+  template:
+    metadata:
+      labels:
+        app: transmission 
+    spec:
+      containers:
+      - name: transmission 
+        image: linuxserver/transmission
+        imagePullPolicy: IfNotPresent
+        volumeMounts:
+        - name: downloads
+          mountPath: /downloads
+        ports:
+        - containerPort: 9091
+        env:
+          - name: USER 
+            value: "test"
+          - name: PASS 
+            value: "test"
+      volumes:
+      - name: downloads
+        persistentVolumeClaim:
+          claimName: transmission
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: transmission
+spec:
+  storageClassName: local-path
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 8Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: transmission 
+spec:
+  ports:
+  - port: 9091
+    targetPort: 9091
+  selector:
+    app: transmission 
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: transmission 
+spec:
+  entryPoints:
+    - web
+  routes:
+  - match: Host(`transmission.bender.sway.org`) && PathPrefix(`/`)
+    kind: Rule
+    services:
+    - name: transmission
+      port: 9091
+    middlewares:
+    - name: redirect
+
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: securetransmission
+spec:
+  entryPoints:
+    - websecure
+  routes:
+  - match: Host(`transmission.bender.sway.org`) && PathPrefix(`/`)
+    kind: Rule
+    services:
+    - name: transmission 
+      port: 9091
+  tls:
+    certResolver: myresolver
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: Middleware
+metadata:
+  name: redirect
+spec:
+  redirectScheme:
+    scheme: https
+    permanent: true

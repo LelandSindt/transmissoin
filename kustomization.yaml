@@ -1,0 +1,9 @@
+namespace: transmission 
+
+images:
+- name: linuxserver/transmission
+  newTag: 3.00-r0-ls60
+
+resources:
+- manifest.yaml
+
