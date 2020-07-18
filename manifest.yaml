@@ -73,13 +73,41 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: transmission 
+  name: transmission-ui
 spec:
   ports:
   - port: 9091
     targetPort: 9091
   selector:
     app: transmission 
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: transmission-data-tcp
+spec:
+  ports:
+    - name: data-tcp
+      port: 51413
+      targetPort: 51413
+      protocol: TCP
+  selector:
+    app: transmission
+  type: LoadBalancer
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: transmission-data-udp
+spec:
+  ports:
+    - name: data-udp
+      port: 51413
+      targetPort: 51413
+      protocol: UDP
+  selector:
+    app: transmission
+  type: LoadBalancer
 ---
 apiVersion: traefik.containo.us/v1alpha1
 kind: IngressRoute
